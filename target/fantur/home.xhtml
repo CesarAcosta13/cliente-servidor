@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>FANTUR</title>
+	<f:event listener="#{sesionBean.verificarSesionCliente}" type="preRenderView"/>
+	<style>
+		
+		.header {
+			padding-bottom: 0.5em;
+		}
+		
+	</style>
+</h:head>
+<body>
+
+	<div class="header">
+		<h:form>
+			<p:growl id="growl" autoUpdate="true" showSummary="true" showDetail="true" />
+			<p:menubar id="menubar">
+				
+				<p:submenu label="Mis Reservas">
+					<p:menuitem value="Reservas realizadas" action="misReservas.xhtml?faces-redirect=true" />
+				</p:submenu>
+				
+				<f:facet name="options">
+					<p:outputLabel value="Bienvenido: #{sesionBean.logueado().email}" />
+					&nbsp;&nbsp;&nbsp;
+	            	<p:commandButton actionListener="#{sesionBean.cerrarSesionCliente}" value="Cerrar Sesión" icon="ui-icon-power" />
+	        	</f:facet>
+			</p:menubar>
+		</h:form>
+	</div>
+	
+	<div class="dashboard">
+		
+		<h:form id="frmPaquetes">
+			<p:dataGrid value="#{paqueteBean.disponibles()}" var="p" columns="4" layout="grid"
+				paginator="true" rows="8" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
+				{PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="4,8,12,16">
+			
+				<f:facet name="header">Paquetes Disponibles</f:facet>
+				
+				<p:panel header="P-#{p.id}" footer="Precio: $#{p.precio}">
+					<span style="font-size: 0.8em;">A: <b>#{p.pasaje.destino}</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					#{p.cantidadPersonas} Persona(s)</span>
+					<br/>
+					<p:rating value="#{p.hotel.estrellas}" readonly="true" />
+					#{p.hotel.nombre}
+					<br/>
+					<span style="font-size: 0.7em; margin-right: 2px">desde:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+																			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+																			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+																			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hasta:</span><br/>
+					<span style="font-size: 0.8em;">&nbsp;#{p.pasaje.fechaPartida}</span>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<span style="font-size: 0.8em;">#{p.pasaje.fechaRegreso}</span>
+					<br/>
+					
+					<p:commandLink title="Detalles" actionListener="#{paqueteBean.leer(p)}" oncomplete="PF('widgetdetail').show();" update="detaildialog">
+						<h:outputText value="Ver detalle" style="float: right; color: blue;"/>
+					</p:commandLink>
+					
+					<br/>
+				</p:panel>	
+				
+			</p:dataGrid>
+		</h:form>
+		
+		<!-- widget detalle paquete -->
+		<p:dialog id="detaildialog" widgetVar="widgetdetail" header="Detalle '#{paqueteBean.paquete.nombre}'" modal="true" resizable="false" closeOnEscape="true" draggable="false">
+			<p>#{paqueteBean.paquete.descripcion}</p>
+			<p><b>Cantidad de Personas:</b> #{paqueteBean.paquete.cantidadPersonas} &nbsp; <b>Precio del paquete:</b> \$ #{paqueteBean.paquete.precio}</p>
+			<p><b>Cantidad de paquetes disponibles:</b> #{paqueteBean.paquete.cantidadDisponible}</p>
+			<p:separator/>
+			<p><b>Pasaje incluido con el paquete:</b></p>
+			<p>Desde: #{paqueteBean.paquete.getPasaje().getOrigen()} &nbsp;&nbsp; hasta: #{paqueteBean.paquete.getPasaje().getDestino()}</p>
+			<p>Sale el #{paqueteBean.paquete.getPasaje().getFechaPartida()} y vuelve el #{paqueteBean.paquete.getPasaje().getFechaRegreso()}</p>
+			<p>Medio de transporte: #{paqueteBean.paquete.getPasaje().getMedioTransporte()}</p>
+			<p:separator/>
+			<p><b>Estadía incluida con el paquete:</b></p>
+			<p>Hotel: #{paqueteBean.paquete.getHotel().getNombre()}</p>
+			<p>Locación: #{paqueteBean.paquete.getHotel().getDireccion()}</p>
+			<p:separator/>
+			<p><b>Actividades incluidas con el paquete:</b></p>
+					<h:form>
+						<p:dataList value="#{paqueteBean.paquete.getActividades()}" var="a" type="ordered" emptyMessage="Este paquete no incluye actividades.">
+							#{a.nombre}
+						</p:dataList>
+					</h:form>
+			<p:separator/>
+			<div align="center">
+				<p:commandButton value="Reservar" icon="ui-icon-check" actionListener="#{reservaBean.reservar(paqueteBean.paquete)}" 
+								onclick="PF('widgetdetail').hide();" action="home.xhtml?faces-redirect=true" />			
+			</div>
+		</p:dialog>
+		
+	</div>
+	
+</body>
+</html>

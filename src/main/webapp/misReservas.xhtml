@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>Mis Reservas</title>
+	<f:event listener="#{sesionBean.verificarSesionCliente}" type="preRenderView"/>
+</h:head>
+<body>
+
+	<p:breadCrumb>
+		<p:menuitem value="Home" url="home.xhtml" />
+		<p:menuitem value="Mis Reservas" url="misReservas.xhtml" />
+	</p:breadCrumb>
+	
+	<br/>
+	
+	<div class="dashboard">
+		
+		<h:form id="frmReservas">
+			<p:growl id="growl" autoUpdate="true" showSummary="true" showDetail="true" />
+			<p:dataTable value="#{reservaBean.listaMisReservas()}" var="r" stickyHeader="true" emptyMessage="No ha realizado reservas.">
+			
+				<f:facet name="header">
+					<h:outputText value="Mis Reservas"/>
+				</f:facet>
+			
+				<p:column headerText="Fecha Reserva" width="120">
+					<h:outputText value="#{r.fechaReserva}"/>
+				</p:column>
+				
+				<p:column headerText="Paquete">
+					<h:outputText value="#{r.paquete.nombre}"/>
+				</p:column>
+			
+				<p:column headerText="Estado" width="120">
+					<h:outputText value="#{r.estado}" />
+				</p:column>
+				
+				<p:column headerText="Precio" width="120">
+					<h:outputText value="#{r.paquete.precio}">
+						<f:convertNumber type="currency" currencySymbol="$"/>
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Fecha pago" width="120">
+					<h:outputText value="#{pagoBean.getFechaPago(r)}"/>
+				</p:column>
+				
+				<p:column headerText="Medio de pago" width="120">
+					<h:outputText value="#{pagoBean.getMedioDePago(r)}"/>
+				</p:column>
+				
+				<p:column width="120">
+					<p:commandLink value="Realizar pago" actionListener="#{reservaBean.leer(r)}" oncomplete="PF('widgetdialog').show();" update="dialog" style="color: blue;"/>
+				</p:column>
+				
+				<p:column width="120">
+					<p:commandLink value="Cancelar reserva" actionListener="#{reservaBean.cancelarReserva(r)}" update="frmReservas" style="color: blue;">
+						<p:confirm header="Cancelar Reserva" message="¿Está seguro?" icon="ui-icon-alert" />
+					</p:commandLink>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+						<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>					
+					</p:confirmDialog>
+				</p:column>				
+			
+			</p:dataTable>
+		
+		</h:form>
+		
+	</div>
+	
+	<!-- widget pagar reserva -->
+	<p:dialog id="dialog" widgetVar="widgetdialog" header="Pagar Reserva" modal="true" resizable="false" closeOnEscape="true" draggable="false">
+		<h:form id="frmDialog">
+			<h:panelGrid columns="2">
+				
+				<p:outputLabel for="fecReserva" value="Fec. Reserva"/>
+				<p:calendar id="fecReserva" value="#{reservaBean.reserva.fechaReserva}" pattern="dd/mm/yyyy" disabled="true"/>
+				
+				<p:outputLabel for="estado" value="Estado"/>
+				<p:inputText id="estado" value="#{reservaBean.reserva.estado}" disabled="true"/>
+				
+				<p:outputLabel for="medioDePago" value="Medio de Pago"/>
+				<p:selectOneMenu id="medioDePago" value="#{pagoBean.medioDePagoId}" style="width: 200px" >
+					<f:selectItem itemLabel="- Seleccione -" />
+					<f:selectItems value="#{pagoBean.getMediosDePago()}" var="mp" itemValue="#{mp.id}" itemLabel="#{mp.nombre}" />
+				</p:selectOneMenu>	
+				
+				<br/>
+				<p:commandButton value="Realizar Pago" icon="ui-icon-check" action="#{pagoBean.pagarReserva(reservaBean.reserva)}" onclick="PF('widgetdialog').hide();" update="frmReservas"/>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+	
+</body>
+</html>

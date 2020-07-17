@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>Nuevo Pasaje</title>
+	<f:event listener="#{sesionBean.verificarSesionAdmin}" type="preRenderView"/>
+</h:head>
+<body>
+
+	<p:breadCrumb>
+		<p:menuitem value="Home" url="home.xhtml" />
+		<p:menuitem value="Pasajes" url="pasajes.xhtml" />
+		<p:menuitem value="Nuevo" url="nuevoPasaje.xhtml" />
+	</p:breadCrumb>
+	
+	<br/>
+
+	<h:form>
+		<p:fieldset legend="Nuevo Pasaje">
+			<h:panelGrid id="grid" columns="3">
+				<p:outputLabel for="origen" value="Origen"/>
+				<p:inputText id="origen" value="#{pasajeBean.pasaje.origen}" required="true" requiredMessage="Este campo no puede estar vacío"/>
+				<p:message for="origen"/>
+				
+				<p:outputLabel for="destino" value="Destino"/>
+				<p:inputText id="destino" value="#{pasajeBean.pasaje.destino}" required="true" requiredMessage="Este campo no puede estar vacío"/>
+				<p:message for="destino"/>
+				
+				<p:outputLabel for="fecPartida" value="Fec. Partida"/>
+				<p:calendar id="fecPartida" value="#{pasajeBean.pasaje.fechaPartida}" required="true" requiredMessage="Este campo no puede estar vacío"/>
+				<p:message for="fecPartida"/>
+				
+				<p:outputLabel for="fecRegreso" value="Fec. Regreso"/>
+				<p:calendar id="fecRegreso" value="#{pasajeBean.pasaje.fechaRegreso}" required="true" requiredMessage="Este campo no puede estar vacío"/>
+				<p:message for="fecRegreso"/>
+				
+				<p:outputLabel for="precio" value="Precio"/>
+				<p:inputText id="precio" value="#{pasajeBean.pasaje.precioPasaje}" required="true" requiredMessage="Este campo no puede estar vacío"/>
+				<p:message for="precio"/>
+				
+				<p:outputLabel for="transporte" value="Transporte"/>
+				<p:inputText id="transporte" value="#{pasajeBean.pasaje.medioTransporte}" required="true" requiredMessage="Este campo no puede estar vacío"/>
+				<p:message for="transporte"/>
+				
+				<p:commandButton icon="ui-icon-check" actionListener="#{pasajeBean.createPasaje()}" value="Guardar" action="pasajes.xhtml?faces-redirect=true" update="grid"/>
+				<p:button icon="ui-icon-close" value="Cancelar" outcome="pasajes.xhtml?faces-redirect=true"/>
+			</h:panelGrid>
+		</p:fieldset>
+	</h:form>
+
+</body>
+</html>
